@@ -1,64 +1,198 @@
--- Batch 1
-INSERT ALL
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('FND_ACT_ST_CNFG', 'FUND ACCOUNTING STAR CONFIGURATION', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('ACCT_MNGR', 'ACCOUNT MANAGER', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('CA_OP', 'CREDIT ADMIN & OPERATIONS', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('CAP', 'CLIENT ACCOUNT PROFILE', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('CAPMGT', 'CLIENT ACCOUNT PROFILE MANAGEMENT', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('CAT', 'CENTRAL ACCOUNT TEAM', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('COMPLIANCE', 'COMPLIANCE APPROVER', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('CORE_CNTR', 'CORE CONTROLLERS', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('CORP_ACT', 'CORPORATE ACTIONS', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('CORP_ACT_SOD', 'CORPORATE ACTIONS SOD', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('CS_HUB', 'CLIENT SERVICE HUB', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('DEPT_HD', 'DEPARTMENT HEAD', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('DIER_CNTR', 'DIER II CONTROLLERS', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('FX', 'FOREIGN EXCHANGE', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('FX_REG', 'FOREIGN EXCHANGE REG REPORTING', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('FXCLS', 'FX-CLS', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('GTO', 'GLOBAL TAX OPERATIONS', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('GTS', 'GLOBAL TAX SERVICE', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('IM_CS', 'IM CLIENT SERVICE', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('IM_RISK_MNGT', 'IM RISK MANAGEMENT', 'SYSTEM')
-SELECT 1 FROM DUAL;
+SET DEFINE OFF;
 
--- Batch 2
-INSERT ALL
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('IMS_MGMT', 'INVESTMENT MANAGEMENT SERVICE (ASMG)', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('IRAA_RISK', 'IRAA RISK', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('IS_BILLING', 'IS BILLING', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('MUTUAL_FUNDS', 'MUTUAL FUNDS', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('NETWORK', 'NETWORK', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('PB_BILLING', 'PB BILLING', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('REG', 'REGISTRATION APPROVER TEAM', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('REG2', 'REGISTRATION APPROVER TEAM 2', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('REGMGT', 'REGISTRATION TEAM MANAGEMENT', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('RISK', 'RISK', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('TECH', 'TECHNOLOGY PRODUCT MANAGEMENT', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('TREASURY_BOS', 'TREASURY BOSTON', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('TREASURY_NY', 'TREASURY NEW YORK', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('AMR_REQUESTOR', 'AMR REQUESTOR', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('FUND_TRNF_US', 'FUND TRANSFER US', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('R_A', 'RECONCILIATION AND ANALYSIS', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('FX_OPS', 'FOREIGN EXCHANGE OPS', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('NNIP_CSG', 'NNIP CSG APPROVER', 'SYSTEM')
-SELECT 1 FROM DUAL;
+-- Insert Configuration 1: SENDER_AUTH - ADD with PROCESS_TYPE override
+INSERT INTO APPROVAL_WORKFLOW_CONFIG (
+    CONFIG_ID, 
+    FUNCTION_CODE, 
+    TASK_CODE, 
+    APPROVAL_TYPE, 
+    CONFIG_JSON, 
+    IS_ACTIVE, 
+    CREATED_BY, 
+    CREATED_ON
+)
+VALUES (
+    'APPR_CFG_002',
+    'SENDER_AUTH',
+    'ADD',
+    'FIELD_BASED',
+    '{
+        "config_id": "APPR_CFG_002",
+        "function_code": "SENDER_AUTH",
+        "task_code": "ADD",
+        "base_approvers": [
+            {
+                "seq": 1,
+                "group_id": "FUND_TRNF",
+                "group_name": "Funds Transfer"
+            }
+        ],
+        "field_overrides": [
+            {
+                "field": "PROCESS_TYPE",
+                "value": "ACH_DEBIT_BLOCKING",
+                "approvers": [
+                    {"seq": 1, "group_id": "FUND_TRNF", "group_name": "Funds Transfer"},
+                    {"seq": 2, "group_id": "DEPT_HD", "group_name": "Department Head"}
+                ]
+            }
+        ]
+    }',
+    'Y',
+    'SYSTEM',
+    SYSTIMESTAMP
+);
 
--- Batch 3
-INSERT ALL
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('FUND_TRNF', 'FUND TRANSFER', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('FUND_TRNF2', 'FUND TRANSFER 2', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('FUND_TRNF3', 'FUND TRANSFER 3', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('FUND_TRNF4', 'FUND TRANSFER 4', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('FX_DEPT', 'FX DEPARTMENT', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('FT_SPEC_PROC', 'FT SPECIAL PROCESSING', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('GTS1', 'GTS PASSIVE APPROVER 1', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('CGT1', 'CGT PASSIVE APPROVER 1', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('GTS2', 'GTS PASSIVE APPROVER 2', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('SDCD', 'SERVICE DELIVERY COMPLIANCE DISCIPLINE', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('AML_GFC', 'AML COMPLIANCE - GFC', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('AMFX', 'FOREIGN EXCHANGE AMFX', 'SYSTEM')
-    INTO APPROVAL_USER_GROUPS (GROUP_ID, GROUP_NAME, CREATED_BY) VALUES ('SSI_TEAM', 'STANDING SETTLEMENT INSTRUCTION TEAM', 'SYSTEM')
-SELECT 1 FROM DUAL;
+-- Insert Configuration 2: SENDER_AUTH - MODIFY with AMOUNT range conditions
+INSERT INTO APPROVAL_WORKFLOW_CONFIG (
+    CONFIG_ID, 
+    FUNCTION_CODE, 
+    TASK_CODE, 
+    APPROVAL_TYPE, 
+    CONFIG_JSON, 
+    IS_ACTIVE, 
+    CREATED_BY, 
+    CREATED_ON
+)
+VALUES (
+    'APPR_CFG_003',
+    'SENDER_AUTH',
+    'MODIFY',
+    'FIELD_BASED',
+    '{
+        "config_id": "APPR_CFG_003",
+        "function_code": "SENDER_AUTH",
+        "task_code": "MODIFY",
+        "base_approvers": [
+            {
+                "seq": 1,
+                "group_id": "FUND_TRNF",
+                "group_name": "Funds Transfer"
+            }
+        ],
+        "field_overrides": [
+            {
+                "field": "AMOUNT",
+                "conditions": [
+                    {
+                        "range": {"min": 0, "max": 50000},
+                        "approvers": [
+                            {"seq": 1, "group_id": "FUND_TRNF", "group_name": "Funds Transfer"}
+                        ]
+                    },
+                    {
+                        "range": {"min": 50000},
+                        "approvers": [
+                            {"seq": 1, "group_id": "FUND_TRNF", "group_name": "Funds Transfer"},
+                            {"seq": 2, "group_id": "DEPT_HD", "group_name": "Department Head"}
+                        ]
+                    }
+                ]
+            }
+        ]
+    }',
+    'Y',
+    'SYSTEM',
+    SYSTIMESTAMP
+);
+
+-- Insert Configuration 3: BENEFICIARY_MAINT - ADD with COUNTRY override
+INSERT INTO APPROVAL_WORKFLOW_CONFIG (
+    CONFIG_ID, 
+    FUNCTION_CODE, 
+    TASK_CODE, 
+    APPROVAL_TYPE, 
+    CONFIG_JSON, 
+    IS_ACTIVE, 
+    CREATED_BY, 
+    CREATED_ON
+)
+VALUES (
+    'APPR_CFG_004',
+    'BENEFICIARY_MAINT',
+    'ADD',
+    'FIELD_BASED',
+    '{
+        "config_id": "APPR_CFG_004",
+        "function_code": "BENEFICIARY_MAINT",
+        "task_code": "ADD",
+        "base_approvers": [
+            {
+                "seq": 1,
+                "group_id": "OPS_TEAM",
+                "group_name": "Operations Team"
+            }
+        ],
+        "field_overrides": [
+            {
+                "field": "COUNTRY",
+                "value": "INTERNATIONAL",
+                "approvers": [
+                    {"seq": 1, "group_id": "OPS_TEAM", "group_name": "Operations Team"},
+                    {"seq": 2, "group_id": "COMPLIANCE", "group_name": "Compliance"}
+                ]
+            }
+        ]
+    }',
+    'Y',
+    'SYSTEM',
+    SYSTIMESTAMP
+);
+
+-- Insert Configuration 4: LIMIT_MGMT - UPDATE with LIMIT_AMOUNT range conditions
+INSERT INTO APPROVAL_WORKFLOW_CONFIG (
+    CONFIG_ID, 
+    FUNCTION_CODE, 
+    TASK_CODE, 
+    APPROVAL_TYPE, 
+    CONFIG_JSON, 
+    IS_ACTIVE, 
+    CREATED_BY, 
+    CREATED_ON
+)
+VALUES (
+    'APPR_CFG_005',
+    'LIMIT_MGMT',
+    'UPDATE',
+    'FIELD_BASED',
+    '{
+        "config_id": "APPR_CFG_005",
+        "function_code": "LIMIT_MGMT",
+        "task_code": "UPDATE",
+        "base_approvers": [
+            {
+                "seq": 1,
+                "group_id": "REL_MNGR",
+                "group_name": "Relationship Manager"
+            }
+        ],
+        "field_overrides": [
+            {
+                "field": "LIMIT_AMOUNT",
+                "conditions": [
+                    {
+                        "range": {"min": 0, "max": 100000},
+                        "approvers": [
+                            {"seq": 1, "group_id": "REL_MNGR", "group_name": "Relationship Manager"}
+                        ]
+                    },
+                    {
+                        "range": {"min": 100000},
+                        "approvers": [
+                            {"seq": 1, "group_id": "REL_MNGR", "group_name": "Relationship Manager"},
+                            {"seq": 2, "group_id": "RISK_TEAM", "group_name": "Risk Team"},
+                            {"seq": 3, "group_id": "COMPLIANCE", "group_name": "Compliance"}
+                        ]
+                    }
+                ]
+            }
+        ]
+    }',
+    'Y',
+    'SYSTEM',
+    SYSTIMESTAMP
+);
 
 COMMIT;
+
+SET DEFINE ON;
