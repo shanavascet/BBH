@@ -1,0 +1,55 @@
+I can help you convert your `application.properties` file to `application.yml` format for database connectivity. Based on what I can see in your image, here's the conversion:
+
+**application.yml:**
+
+```yaml
+spring:
+  datasource:
+    url: jdbc:oracle:thin:@${dbh.gateway.client.id}:1521/none
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    platform: org.hibernate
+  
+  jpa:
+    database-platform: org.hibernate.dialect.Oracle12cDialect
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        generate_statistics: false
+  
+  cache:
+    jcache:
+      config: classpath:ehcache.xml
+
+com:
+  rdn:
+    portal:
+      region: R0
+
+dbh:
+  gateway:
+    client:
+      id: KAF6G5jHAFvqAD3XNwLNVPbE63YHanDD3n
+      secret: gpDXCQltP1bOdIAR
+
+# DB2
+spring:
+  db2:
+    jpa:
+      database-platform: org.hibernate.dialect.DB2Dialect
+    datasource:
+      driver-class-name: com.ibm.db2.jcc.DB2Driver
+      # Add your DB2 connection details here if needed
+```
+
+**Key differences between .properties and .yml:**
+
+1. **Hierarchy**: YAML uses indentation (2 spaces) instead of dot notation
+2. **No repetition**: Property prefixes are organized hierarchically
+3. **Colons**: Use `:` instead of `=`
+4. **Spacing**: Consistent indentation is crucial
+
+Make sure your indentation is correct (use spaces, not tabs) as YAML is sensitive to formatting.
