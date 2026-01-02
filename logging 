@@ -1,0 +1,123 @@
+I can help you set up similar logging configuration in your Spring Boot application! Based on the image, I can see you're using Logback with a rolling file appender configuration. Here are the steps:
+
+## Steps to Add Logging Configuration
+
+### 1. **Add Logback Dependency** (if not already present)
+
+Add to your `pom.xml`:
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-logging</artifactId>
+</dependency>
+```
+
+### 2. **Create logback-spring.xml**
+
+Create a file named `logback-spring.xml` in `src/main/resources/` directory:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    
+    <!-- Properties for log paths -->
+    <springProperty scope="context" name="LOG_PATH" source="logging.path" defaultValue="/opt/apps/weblogs/rdh-workflow"/>
+    <springProperty scope="context" name="LOG_FILE" source="logging.file" defaultValue="${LOG_PATH}/app.log"/>
+    
+    <!-- Include default Spring Boot logging configuration -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/file-appender.xml"/>
+    
+    <!-- Console Appender -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <!-- Rolling File Appender -->
+    <appender name="FILE_LOGGER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/Rdh_Workflow_Services.log</file>
+        
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/Rdh_Workflow_Services.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>10</maxHistory>
+            <totalSizeCap>5GB</totalSizeCap>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+    </appender>
+    
+    <!-- Async Appender for better performance -->
+    <appender name="FILE_LOGGER_ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="FILE_LOGGER"/>
+    </appender>
+    
+    <!-- Logger configuration -->
+    <logger name="org.springframework.boot" level="WARN">
+        <appender-ref ref="FILE_LOGGER_ASYNC"/>
+    </logger>
+    
+    <!-- Root logger -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE_LOGGER_ASYNC"/>
+    </root>
+    
+</configuration>
+```
+
+### 3. **Update application.properties**
+
+Add these properties to `src/main/resources/application.properties`:
+
+```properties
+# Logging configuration
+logging.path=/opt/apps/weblogs/rdh-workflow
+logging.file=${logging.path}/app.log
+
+# Log levels
+logging.level.root=INFO
+logging.level.com.yourpackage=DEBUG
+logging.level.org.springframework.web=WARN
+```
+
+### 4. **Create Log Directory**
+
+Make sure the log directory exists and has write permissions:
+```bash
+sudo mkdir -p /opt/apps/weblogs/rdh-workflow
+sudo chmod 755 /opt/apps/weblogs/rdh-workflow
+```
+
+### 5. **Use Logging in Your Code**
+
+In your Java classes:
+```java
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class YourService {
+    private static final Logger logger = LoggerFactory.getLogger(YourService.class);
+    
+    public void someMethod() {
+        logger.info("This is an info message");
+        logger.debug("This is a debug message");
+        logger.error("This is an error message", exception);
+    }
+}
+```
+
+### Key Features from the Configuration:
+
+- **Rolling Policy**: Files rotate daily and when they reach 100MB
+- **Max History**: Keeps last 10 log files
+- **Total Size Cap**: Maximum 5GB of logs
+- **Async Logging**: Better performance with AsyncAppender
+- **Pattern**: Timestamp, thread, log level, logger name, and message
+
+Would you like me to adjust any of these settings or add additional features like separate error logs or different log levels for specific packages?
