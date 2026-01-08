@@ -1,0 +1,74 @@
+ package com.yourcompany.microservice.dto;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotBlank;
+
+/**
+ * Request object for receiving Approval Workflow search payloads
+ * from other microservices via REST controllers.
+ */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class ApprovalWorkflowSearchRequest {
+
+    /**
+     * Identifies which client is making the request
+     */
+    @NotBlank(message = "Client identifier cannot be blank")
+    @JsonProperty("clientIdentifier")
+    private String clientIdentifier;
+
+    /**
+     * Workflow key or document type being searched
+     */
+    @NotBlank(message = "Key cannot be blank")
+    @JsonProperty("key")
+    private String key;
+
+    /**
+     * Additional key used for workflow filtering
+     */
+    @JsonProperty("addiKey")
+    private String addiKey;
+
+    /**
+     * Virtual table name representing Approval Workflow data
+     */
+    @NotBlank(message = "Virtual table name cannot be blank")
+    @JsonProperty("virtualTableName")
+    private String virtualTableName;
+
+    /**
+     * Target system identifier
+     */
+    @JsonProperty("target")
+    private String target;
+
+    /**
+     * Column name used for filtering
+     */
+    @JsonProperty("colName")
+    private String columnName;
+
+    /**
+     * Column value used for filtering
+     */
+    @JsonProperty("colval")
+    private String columnValue;
+
+    /**
+     * Operation to apply (e.g., IN, EQUALS)
+     */
+    @JsonProperty("operator")
+    private String operator;
+
+    // Future extension:
+    // private List<QueryFilterRequest> postQueryFilters;
+}
