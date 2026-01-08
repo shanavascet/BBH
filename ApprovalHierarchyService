@@ -1,0 +1,207 @@
+import java.util.*;
+
+/**
+ * Service class to transform approval hierarchy API response
+ */
+public class ApprovalHierarchyService {
+    
+    /**
+     * Main method to get approval hierarchy in new format
+     * This should be called from your controller
+     */
+    public List<IDHDataHolder> getApprovalHierarchy(String configId, 
+                                                     String functionCode, 
+                                                     String taskCode) {
+        
+        // 1. Call your existing microservice to get the original response
+        Map<String, Object> originalResponse = 
+            callApprovalMicroservice(configId, functionCode, taskCode);
+        
+        // 2. Transform to new format
+        List<IDHDataHolder> transformedResponse = 
+            transformToIDHFormat(originalResponse);
+        
+        return transformedResponse;
+    }
+    
+    /**
+     * Calls the existing approval hierarchy microservice
+     */
+    private Map<String, Object> callApprovalMicroservice(String configId, 
+                                                          String functionCode, 
+                                                          String taskCode) {
+        // TODO: Replace with your actual microservice call
+        // Example using RestTemplate or WebClient
+        
+        // RestTemplate restTemplate = new RestTemplate();
+        // String url = "http://localhost:8080/api/approval/hierarchy";
+        // Map<String, String> request = new HashMap<>();
+        // request.put("configId", configId);
+        // request.put("functionCode", functionCode);
+        // request.put("taskCode", taskCode);
+        // return restTemplate.postForObject(url, request, Map.class);
+        
+        // For now, returning a placeholder
+        return new HashMap<>();
+    }
+    
+    /**
+     * Transforms the original response to IDHDataHolder format
+     */
+    private List<IDHDataHolder> transformToIDHFormat(Map<String, Object> originalResponse) {
+        
+        List<IDHDataHolder> result = new ArrayList<>();
+        
+        // Extract approval hops
+        List<Map<String, Object>> approvalHops = 
+            (List<Map<String, Object>>) originalResponse.get("approvalHops");
+        
+        if (approvalHops == null || approvalHops.isEmpty()) {
+            return result;
+        }
+        
+        // Transform each hop into IDHDataHolder
+        for (Map<String, Object> hop : approvalHops) {
+            IDHDataHolder dataHolder = new IDHDataHolder("WORKFLOW_TABLE");
+            dataHolder.setOperation("SELECT");
+            
+            // Set values from the hop
+            dataHolder.getValues().put("sequence", hop.get("sequence"));
+            dataHolder.getValues().put("hopName", hop.get("hopName"));
+            dataHolder.getValues().put("approverGroupId", hop.get("approverGroupId"));
+            dataHolder.getValues().put("approverGroupName", hop.get("approverGroupName"));
+            dataHolder.getValues().put("isMandatory", hop.get("isMandatory"));
+            
+            // Set clientIdentifier
+            dataHolder.setClientIdentifier("RDW");
+            
+            result.add(dataHolder);
+        }
+        
+        return result;
+    }
+}
+
+/**
+ * Controller to expose the new API endpoint
+ */
+@RestController
+@RequestMapping("/api/approval")
+public class ApprovalHierarchyController {
+    
+    @Autowired
+    private ApprovalHierarchyService approvalHierarchyService;
+    
+    /**
+     * New endpoint that returns transformed response
+     */
+    @PostMapping("/hierarchy")
+    public ResponseEntity<List<IDHDataHolder>> getApprovalHierarchy(
+            @RequestBody ApprovalHierarchyRequest request) {
+        
+        try {
+            List<IDHDataHolder> response = approvalHierarchyService.getApprovalHierarchy(
+                request.getConfigId(),
+                request.getFunctionCode(),
+                request.getTaskCode()
+            );
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+}
+
+/**
+ * Request DTO
+ */
+class ApprovalHierarchyRequest {
+    private String configId;
+    private String functionCode;
+    private String taskCode;
+    private String approvalType;
+    
+    // Getters and Setters
+    public String getConfigId() { return configId; }
+    public void setConfigId(String configId) { this.configId = configId; }
+    
+    public String getFunctionCode() { return functionCode; }
+    public void setFunctionCode(String functionCode) { this.functionCode = functionCode; }
+    
+    public String getTaskCode() { return taskCode; }
+    public void setTaskCode(String taskCode) { this.taskCode = taskCode; }
+    
+    public String getApprovalType() { return approvalType; }
+    public void setApprovalType(String approvalType) { this.approvalType = approvalType; }
+}
+
+/**
+ * Alternative: If you want to modify the existing endpoint itself
+ */
+@RestController
+@RequestMapping("/api/approval")
+public class ModifiedApprovalController {
+    
+    @Autowired
+    private ExistingApprovalService existingService;
+    
+    /**
+     * Modified existing endpoint to return new format
+     */
+    @PostMapping("/hierarchy")
+    public ResponseEntity<?> getApprovalHierarchy(
+            @RequestBody ApprovalHierarchyRequest request,
+            @RequestParam(required = false, defaultValue = "false") boolean legacyFormat) {
+        
+        // Get data from your existing logic/microservice
+        Map<String, Object> originalResponse = existingService.getApprovalData(request);
+        
+        // If legacy format requested, return as-is
+        if (legacyFormat) {
+            return ResponseEntity.ok(originalResponse);
+        }
+        
+        // Otherwise, transform to new format
+        List<IDHDataHolder> transformedResponse = transformResponse(originalResponse);
+        return ResponseEntity.ok(transformedResponse);
+    }
+    
+    private List<IDHDataHolder> transformResponse(Map<String, Object> original) {
+        List<IDHDataHolder> result = new ArrayList<>();
+        
+        List<Map<String, Object>> hops = 
+            (List<Map<String, Object>>) original.get("approvalHops");
+        
+        if (hops != null) {
+            for (Map<String, Object> hop : hops) {
+                IDHDataHolder holder = new IDHDataHolder("WORKFLOW_TABLE");
+                holder.setOperation("SELECT");
+                
+                Map<String, Object> values = holder.getValues();
+                values.put("sequence", hop.get("sequence"));
+                values.put("hopName", hop.get("hopName"));
+                values.put("approverGroupId", hop.get("approverGroupId"));
+                values.put("approverGroupName", hop.get("approverGroupName"));
+                values.put("isMandatory", hop.get("isMandatory"));
+                
+                holder.setClientIdentifier("RDW");
+                
+                result.add(holder);
+            }
+        }
+        
+        return result;
+    }
+}
+
+/**
+ * Placeholder for existing service
+ */
+class ExistingApprovalService {
+    public Map<String, Object> getApprovalData(ApprovalHierarchyRequest request) {
+        // Your existing logic here
+        return new HashMap<>();
+    }
+}
