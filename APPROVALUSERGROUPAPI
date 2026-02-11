@@ -1,0 +1,317 @@
+package com.example.demo.controller;
+
+import com.example.demo.entity.ApprovalUserGroup;
+import com.example.demo.service.ApprovalUserGroupService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/approval-user-groups")
+@RequiredArgsConstructor
+public class ApprovalUserGroupController {
+
+    private final ApprovalUserGroupService service;
+
+    /**
+     * GET /api/approval-user-groups
+     * Get all groups or filter by groupId and/or groupName
+     * 
+     * Examples:
+     * - GET /api/approval-user-groups (all groups)
+     * - GET /api/approval-user-groups?groupId=G001 (filter by ID)
+     * - GET /api/approval-user-groups?groupName=Admin (filter by name)
+     * - GET /api/approval-user-groups?groupId=G001&groupName=Admin (both filters)
+     */
+    @GetMapping
+    public ResponseEntity<List<ApprovalUserGroup>> getApprovalUserGroups(
+            @RequestParam(required = false) String groupId,
+            @RequestParam(required = false) String groupName) {
+        
+        List<ApprovalUserGroup> groups;
+        
+        // If no filters provided, get all groups
+        if ((groupId == null || groupId.trim().isEmpty()) && 
+            (groupName == null || groupName.trim().isEmpty())) {
+            groups = service.getAllApprovalUserGroups();
+        } else {
+            // Apply filters
+            groups = service.getApprovalUserGroups(groupId, groupName);
+        }
+        
+        return ResponseEntity.ok(groups);
+    }
+
+    /**
+     * GET /api/approval-user-groups/{groupId}
+     * Get a specific group by ID
+     */
+    @GetMapping("/{groupId}")
+    public ResponseEntity<ApprovalUserGroup> getGroupById(@PathVariable String groupId) {
+        try {
+            ApprovalUserGroup group = service.getGroupById(groupId);
+            return ResponseEntity.ok(group);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    /**
+     * POST /api/approval-user-groups
+     * Create a new approval user group
+     */
+    @PostMapping
+    public ResponseEntity<ApprovalUserGroup> createGroup(@RequestBody ApprovalUserGroup group) {
+        try {
+            ApprovalUserGroup createdGroup = service.createGroup(group);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdGroup);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    /**
+     * PUT /api/approval-user-groups/{groupId}
+     * Update an existing group
+     */
+    @PutMapping("/{groupId}")
+    public ResponseEntity<ApprovalUserGroup> updateGroup(
+            @PathVariable String groupId,
+            @RequestBody ApprovalUserGroup group) {
+        try {
+            ApprovalUserGroup updatedGroup = service.updateGroup(groupId, group);
+            return ResponseEntity.ok(updatedGroup);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    /**
+     * DELETE /api/approval-user-groups/{groupId}
+     * Soft delete a group (sets IS_DELETED = 'Y')
+     */
+    @DeleteMapping("/{groupId}")
+    public ResponseEntity<Void> deleteGroup(@PathVariable String groupId) {
+        try {
+            service.deleteGroup(groupId);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+}
+
+
+package com.example.demo.service;
+
+import com.example.demo.entity.ApprovalUserGroup;
+import com.example.demo.repository.ApprovalUserGroupRepository;
+import jakarta.persistence.criteria.Predicate;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class ApprovalUserGroupService {
+
+    private final ApprovalUserGroupRepository repository;
+
+    /**
+     * Get approval user groups with optional filters
+     * @param groupId Optional group ID filter
+     * @param groupName Optional group name filter
+     * @return List of matching groups
+     */
+    public List<ApprovalUserGroup> getApprovalUserGroups(String groupId, String groupName) {
+        // Build dynamic specification based on filters
+        Specification<ApprovalUserGroup> spec = (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            // Filter by group ID if provided
+            if (groupId != null && !groupId.trim().isEmpty()) {
+                predicates.add(criteriaBuilder.equal(root.get("groupId"), groupId));
+            }
+
+            // Filter by group name if provided (case-insensitive partial match)
+            if (groupName != null && !groupName.trim().isEmpty()) {
+                predicates.add(criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("groupName")), 
+                    "%" + groupName.toLowerCase() + "%"
+                ));
+            }
+
+            // Optionally filter out deleted groups
+            predicates.add(criteriaBuilder.equal(root.get("isDeleted"), "N"));
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+
+        return repository.findAll(spec);
+    }
+
+    /**
+     * Get all approval user groups (excluding deleted)
+     * @return List of all active groups
+     */
+    public List<ApprovalUserGroup> getAllApprovalUserGroups() {
+        return repository.findByIsDeleted("N");
+    }
+
+    /**
+     * Get a specific group by ID
+     * @param groupId Group ID
+     * @return ApprovalUserGroup if found
+     */
+    public ApprovalUserGroup getGroupById(String groupId) {
+        return repository.findByGroupId(groupId)
+                .orElseThrow(() -> new RuntimeException("Group not found with ID: " + groupId));
+    }
+
+    /**
+     * Create a new approval user group
+     * @param group Group to create
+     * @return Created group
+     */
+    public ApprovalUserGroup createGroup(ApprovalUserGroup group) {
+        // Set default values if not provided
+        if (group.getStatus() == null) {
+            group.setStatus("ACTIVE");
+        }
+        if (group.getIsDeleted() == null) {
+            group.setIsDeleted("N");
+        }
+        return repository.save(group);
+    }
+
+    /**
+     * Update an existing group
+     * @param groupId Group ID to update
+     * @param updatedGroup Updated group data
+     * @return Updated group
+     */
+    public ApprovalUserGroup updateGroup(String groupId, ApprovalUserGroup updatedGroup) {
+        ApprovalUserGroup existingGroup = getGroupById(groupId);
+        
+        if (updatedGroup.getGroupName() != null) {
+            existingGroup.setGroupName(updatedGroup.getGroupName());
+        }
+        if (updatedGroup.getStatus() != null) {
+            existingGroup.setStatus(updatedGroup.getStatus());
+        }
+        if (updatedGroup.getDescription() != null) {
+            existingGroup.setDescription(updatedGroup.getDescription());
+        }
+        if (updatedGroup.getEffectiveStartDate() != null) {
+            existingGroup.setEffectiveStartDate(updatedGroup.getEffectiveStartDate());
+        }
+        if (updatedGroup.getEffectiveEndDate() != null) {
+            existingGroup.setEffectiveEndDate(updatedGroup.getEffectiveEndDate());
+        }
+        if (updatedGroup.getUpdatedBy() != null) {
+            existingGroup.setUpdatedBy(updatedGroup.getUpdatedBy());
+        }
+        
+        return repository.save(existingGroup);
+    }
+
+    /**
+     * Soft delete a group
+     * @param groupId Group ID to delete
+     */
+    public void deleteGroup(String groupId) {
+        ApprovalUserGroup group = getGroupById(groupId);
+        group.setIsDeleted("Y");
+        repository.save(group);
+    }
+}
+
+package com.example.demo.repository;
+
+import com.example.demo.entity.ApprovalUserGroup;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface ApprovalUserGroupRepository extends JpaRepository<ApprovalUserGroup, String>, 
+                                                      JpaSpecificationExecutor<ApprovalUserGroup> {
+
+    // Find by group ID
+    Optional<ApprovalUserGroup> findByGroupId(String groupId);
+
+    // Find by group name
+    List<ApprovalUserGroup> findByGroupName(String groupName);
+
+    // Find by group ID and group name
+    Optional<ApprovalUserGroup> findByGroupIdAndGroupName(String groupId, String groupName);
+
+    // Find all active groups
+    List<ApprovalUserGroup> findByIsDeleted(String isDeleted);
+}
+
+
+package com.example.demo.entity;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "APPROVAL_USER_GROUPS")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ApprovalUserGroup {
+
+    @Id
+    @Column(name = "GROUP_ID", length = 50, nullable = false)
+    private String groupId;
+
+    @Column(name = "GROUP_NAME", length = 200, nullable = false)
+    private String groupName;
+
+    @Column(name = "STATUS", length = 20, columnDefinition = "VARCHAR2(20) DEFAULT 'ACTIVE'")
+    private String status;
+
+    @Column(name = "EFFECTIVE_START_DATE", columnDefinition = "DATE DEFAULT SYSDATE")
+    private LocalDate effectiveStartDate;
+
+    @Column(name = "EFFECTIVE_END_DATE")
+    private LocalDate effectiveEndDate;
+
+    @CreationTimestamp
+    @Column(name = "CREATED_ON", nullable = false, updatable = false)
+    private LocalDateTime createdOn;
+
+    @Column(name = "CREATED_BY", length = 100, nullable = false)
+    private String createdBy;
+
+    @UpdateTimestamp
+    @Column(name = "UPDATED_ON")
+    private LocalDateTime updatedOn;
+
+    @Column(name = "UPDATED_BY", length = 100)
+    private String updatedBy;
+
+    @Column(name = "DESCRIPTION", length = 500)
+    private String description;
+
+    @Column(name = "IS_DELETED", length = 1, columnDefinition = "CHAR(1) DEFAULT 'N'")
+    private String isDeleted;
+}
