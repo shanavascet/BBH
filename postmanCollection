@@ -1,0 +1,298 @@
+{
+  "info": {
+    "name": "Approval User Groups API",
+    "description": "Complete API collection for testing Approval User Groups endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Get All Groups",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/approval-user-groups",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "approval-user-groups"]
+        },
+        "description": "Retrieves all active approval user groups"
+      }
+    },
+    {
+      "name": "Get Groups - Filter by Group ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/approval-user-groups?groupId=G001",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "approval-user-groups"],
+          "query": [
+            {
+              "key": "groupId",
+              "value": "G001",
+              "description": "Exact match on group ID"
+            }
+          ]
+        },
+        "description": "Filter groups by exact group ID"
+      }
+    },
+    {
+      "name": "Get Groups - Filter by Group Name",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/approval-user-groups?groupName=Admin",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "approval-user-groups"],
+          "query": [
+            {
+              "key": "groupName",
+              "value": "Admin",
+              "description": "Partial match, case-insensitive"
+            }
+          ]
+        },
+        "description": "Filter groups by group name (partial match, case-insensitive)"
+      }
+    },
+    {
+      "name": "Get Groups - Filter by Both",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/approval-user-groups?groupId=G001&groupName=Admin",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "approval-user-groups"],
+          "query": [
+            {
+              "key": "groupId",
+              "value": "G001"
+            },
+            {
+              "key": "groupName",
+              "value": "Admin"
+            }
+          ]
+        },
+        "description": "Filter by both group ID and group name"
+      }
+    },
+    {
+      "name": "Get Group by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/approval-user-groups/G001",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "approval-user-groups", "G001"]
+        },
+        "description": "Get a specific group by ID"
+      }
+    },
+    {
+      "name": "Create Group - Valid",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"groupId\": \"G999\",\n  \"groupName\": \"Test Manager Group\",\n  \"status\": \"ACTIVE\",\n  \"createdBy\": \"test.user\",\n  \"description\": \"Created via Postman for testing\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/approval-user-groups",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "approval-user-groups"]
+        },
+        "description": "Create a new group with valid data"
+      }
+    },
+    {
+      "name": "Create Group - Missing Required Fields",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"groupId\": \"\",\n  \"groupName\": \"Test Group\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/approval-user-groups",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "approval-user-groups"]
+        },
+        "description": "Test validation - should return 400 with validation errors"
+      }
+    },
+    {
+      "name": "Create Group - Invalid Status",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"groupId\": \"G888\",\n  \"groupName\": \"Test Group\",\n  \"status\": \"INVALID_STATUS\",\n  \"createdBy\": \"test.user\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/approval-user-groups",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "approval-user-groups"]
+        },
+        "description": "Test validation - status must be ACTIVE or INACTIVE"
+      }
+    },
+    {
+      "name": "Create Group - Duplicate ID",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"groupId\": \"G001\",\n  \"groupName\": \"Duplicate Group\",\n  \"status\": \"ACTIVE\",\n  \"createdBy\": \"test.user\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/approval-user-groups",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "approval-user-groups"]
+        },
+        "description": "Test business rule - should return 400 for duplicate group ID"
+      }
+    },
+    {
+      "name": "Update Group - Valid",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"groupName\": \"Updated Manager Group\",\n  \"description\": \"Updated description\",\n  \"status\": \"INACTIVE\",\n  \"updatedBy\": \"test.user\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/approval-user-groups/G999",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "approval-user-groups", "G999"]
+        },
+        "description": "Update an existing group (partial update)"
+      }
+    },
+    {
+      "name": "Update Group - Partial Update",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"groupName\": \"Only Name Updated\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/approval-user-groups/G999",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "approval-user-groups", "G999"]
+        },
+        "description": "Update only specific fields"
+      }
+    },
+    {
+      "name": "Update Group - Not Found",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"groupName\": \"Updated Name\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/approval-user-groups/INVALID_ID",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "approval-user-groups", "INVALID_ID"]
+        },
+        "description": "Test error handling - should return 404"
+      }
+    },
+    {
+      "name": "Delete Group",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/approval-user-groups/G999",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "approval-user-groups", "G999"]
+        },
+        "description": "Soft delete a group (sets IS_DELETED = 'Y')"
+      }
+    },
+    {
+      "name": "Delete Group - Not Found",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/approval-user-groups/INVALID_ID",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "approval-user-groups", "INVALID_ID"]
+        },
+        "description": "Test error handling - should return 404"
+      }
+    },
+    {
+      "name": "Get Deleted Group",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/approval-user-groups/G999",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "approval-user-groups", "G999"]
+        },
+        "description": "Verify that deleted groups don't appear in results"
+      }
+    }
+  ]
+}
