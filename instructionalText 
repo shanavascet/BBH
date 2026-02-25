@@ -1,0 +1,110 @@
+<div style="font-family: 'Calibri', 'Segoe UI', sans-serif; font-size: 11pt; color: #000; line-height: 1.5;">
+
+  <!-- Alert Banner -->
+  <div style="border: 1.5px solid #000; padding: 9px 12px; margin-bottom: 12px; line-height: 1.45;">
+    <strong>Accounts with blocking codes 0001, 0002, or 0021 are related to Sanctions should be escalated to SDCD for approval and processed via AMR.</strong>
+  </div>
+
+  <!-- Blocking Codes Table -->
+  <table style="width: 100%; border-collapse: collapse; font-size: 8.5pt; margin-bottom: 14px;">
+    <tbody>
+      <tr>
+        <td style="border: 1px solid #000; padding: 4px 6px; font-weight: 600; color: #c00000; vertical-align: top;">0001 OFAC BLOCKED</td>
+        <td style="border: 1px solid #000; padding: 4px 6px; font-weight: 600; color: #c00000; vertical-align: top;">0002 OFAC RESTRICTED</td>
+        <td style="border: 1px solid #000; padding: 4px 6px; font-weight: 600; color: #c00000; vertical-align: top;">0021 NON-OFAC SANCTIONS BLOCK</td>
+        <td style="border: 1px solid #000; padding: 4px 6px; font-weight: 600; vertical-align: top;">0003 BLOCK AND CERTIFY</td>
+        <td style="border: 1px solid #000; padding: 4px 6px; font-weight: 600; vertical-align: top;">0004 FINCEN</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 4px 6px; font-weight: 600; vertical-align: top;">0005 THIRD PARTY PAYMENT</td>
+        <td style="border: 1px solid #000; padding: 4px 6px; font-weight: 600; vertical-align: top;">0006 FINANCIAL INTELLIGENCE UNIT (FIU) BLOCK</td>
+        <td style="border: 1px solid #000; padding: 4px 6px; font-weight: 600; vertical-align: top;">0007 CID RENEWAL</td>
+        <td style="border: 1px solid #000; padding: 4px 6px; font-weight: 600; vertical-align: top;">0008 EXPIRED KYC EXCEPTION</td>
+        <td style="border: 1px solid #000; padding: 4px 6px; font-weight: 600; vertical-align: top;">0009 TAX LEVY</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 4px 6px; font-weight: 600; vertical-align: top;">0010 SUBPOENA</td>
+        <td style="border: 1px solid #000; padding: 4px 6px; font-weight: 600; vertical-align: top;">0011 VOLUNTARY LIQUIDATION</td>
+        <td style="border: 1px solid #000; padding: 4px 6px; font-weight: 600; vertical-align: top;">0012 ACCOUNT CLOSING</td>
+        <td style="border: 1px solid #000; padding: 4px 6px; font-weight: 600; vertical-align: top;">0013 DEATH OF CLIENT</td>
+        <td style="border: 1px solid #000; padding: 4px 6px; font-weight: 600; vertical-align: top;">0014 LOW PRICED SECURITIES (LPS) BLOCKED</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 4px 6px; font-weight: 600; vertical-align: top;">0015 TERMINATING CLIENT</td>
+        <td style="border: 1px solid #000; padding: 4px 6px; font-weight: 600; vertical-align: top;">0018 AML GENERAL</td>
+        <td style="border: 1px solid #000; padding: 4px 6px; font-weight: 600; vertical-align: top;">0019 CLIENT-DIRECTED ACCOUNT BLOCK</td>
+        <td style="border: 1px solid #000; padding: 4px 6px; font-weight: 600; vertical-align: top;">0020 GTPS-ONLY BLOCK</td>
+        <td style="border: 1px solid #000; padding: 4px 6px; font-weight: 600; vertical-align: top;">0022 FRAUD</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 4px 6px; font-weight: 600; vertical-align: top;">0023 LITIGATION</td>
+        <td style="border: 1px solid #000; padding: 4px 6px; font-weight: 600; vertical-align: top;">0024 ABANDONED PROPERTY</td>
+        <td style="border: 1px solid #000; padding: 4px 6px;"></td>
+        <td style="border: 1px solid #000; padding: 4px 6px;"></td>
+        <td style="border: 1px solid #000; padding: 4px 6px;"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Client Auth -->
+  <p style="margin: 14px 0 10px;">
+    <strong>CLIENT AUTHORIZATION SOURCE DOCUMENT MUST BE ATTACHED TO REQUEST.</strong>
+  </p>
+
+  <!-- BIC Section -->
+  <p style="text-decoration: underline; margin-bottom: 5px;">Each Sender Authorization Process Type will require a BIC, DN or ID</p>
+  <p style="margin-bottom: 6px;">
+    <strong>BIC Address</strong> – The BIC address must be present on the Swift table, except for TRDS. Trade Authorization must be entered manually by the user.
+  </p>
+
+  <ul style="list-style-type: disc; padding-left: 30px; margin: 4px 0 16px;">
+    <li style="margin-bottom: 3px;">COLC - Allow movement of cash (collateral) from segregated account to head account</li>
+    <li style="margin-bottom: 3px;">COLS - Allow movement of shares (collateral) from segregated account to head account</li>
+    <li style="margin-bottom: 3px;">DNPF - Do Not Allow MT304 Forward (AFWD) Processing</li>
+    <li style="margin-bottom: 3px;">DNPA - Do Not Allow MT304 Spot (ASET) Processing</li>
+    <li style="margin-bottom: 3px;">FWDP - Allow MT304 Forward (AFWD) Processing</li>
+    <li style="margin-bottom: 3px;">
+      PBAM - Payment Based Allocation Method<br>
+      <span>CSG &amp; TAX must ensure Momentum profile is created for successful execution</span>
+    </li>
+    <li style="margin-bottom: 3px;">PMTS - Payment Authorization</li>
+    <li style="margin-bottom: 3px;">TRDS - Trades Authorization Custody/ MX20022 Mutual Funds FTP</li>
+  </ul>
+
+  <!-- MX20022 -->
+  <p style="margin-bottom: 12px;">
+    <strong>MX20022 Mutual Fund Distinguished Name (DN)</strong><br>
+    MFDN - Distinguished Names that are authorized to instruct trades for Mutual Funds MX20022 Messaging.
+  </p>
+
+  <!-- ACH -->
+  <p style="margin-bottom: 12px;">
+    <strong>ACH Identification Number (ID)</strong> - users must provide up to 18 characters.<br>
+    ACHD – ACH Debit Blocking (ID) - Important: Removal of ACHD linkage from a blocked account to itself is strictly prohibited.
+  </p>
+
+  <!-- Timeframe -->
+  <p style="color: #1f5c99; font-weight: bold; text-decoration: underline; margin-bottom: 5px;">Timeframe for Sender Authorization Updates</p>
+  <p style="color: #1f5c99; line-height: 1.6; margin-bottom: 20px;">
+    Sender Authorization updates occur in real time. If a current BIC/ACH ID/DN is being removed, the client must not continue to submit instructions under that BIC/ACH ID/DN, as doing so will result in a failed transaction. If the client submits an instruction using the previous BIC/ACH ID/DN and the transaction fails, CSG must coordinate with Trade Management, Funds Transfer, and Mutual Fund Dept to repair the failed client transaction.
+  </p>
+
+  <!-- Form Fields -->
+  <div style="border: 1px solid #aaa;">
+    <div style="padding: 6px 10px 2px;">Account Title</div>
+    <div style="min-height: 36px; padding: 2px 10px;"></div>
+  </div>
+  <div style="border: 1px solid #aaa; border-top: none;">
+    <div style="padding: 6px 10px 2px;">RICS</div>
+    <div style="min-height: 36px; padding: 2px 10px;"></div>
+  </div>
+  <div style="border: 1px solid #aaa; border-top: none;">
+    <div style="padding: 6px 10px 2px;">Investment</div>
+    <div style="min-height: 36px; padding: 2px 10px;"></div>
+  </div>
+  <div style="border: 1px solid #aaa; border-top: none;">
+    <div style="padding: 6px 10px 2px;">BIDS</div>
+    <div style="min-height: 36px; padding: 2px 10px;"></div>
+  </div>
+
+</div>
