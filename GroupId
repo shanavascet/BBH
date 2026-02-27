@@ -1,0 +1,25 @@
+Based on the existing `fetchApprovalGroup` pattern in your code, here's a new function for fetching a single group by ID:
+
+```java
+@Cacheable("userGroupData")
+public UserGroupDTO fetchGroupById(long groupId) {
+    return webClient.get()
+            .uri(uri -> uri.path("/api/group/{id}")
+                    .build(groupId))
+            .accept(MediaType.APPLICATION_JSON)
+            .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .retrieve()
+            .bodyToMono(UserGroupDTO.class)
+            .block(); // OK here since it's during startup
+}
+```
+
+A few things worth noting:
+
+**Key differences from `fetchApprovalGroup`:** Since you're fetching a *single* entity, I used `.bodyToMono(UserGroupDTO.class)` instead of `.bodyToFlux(...).collectList()` — no need to collect a list when the endpoint returns one object.
+
+**URI with path variable:** The `.uri(uri -> uri.path(...).build(groupId))` lambda style is the proper way to inject the `groupId` into the path dynamically with WebClient.
+
+**Cache key:** `@Cacheable("userGroupData")` will use `groupId` as the cache key automatically since it's the only parameter. If you want a more explicit key, you can write `@Cacheable(value = "userGroupData", key = "#groupId")`.
+
+Adjust the cache name and API path (`/api/group/{id}`) to match your actual endpoint.
